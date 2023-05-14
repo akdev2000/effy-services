@@ -5,11 +5,19 @@ import { User } from "../models/User";
 const router = Router();
 
 router.post("/user/add", async (req, res) => {
-  const { first_name, last_name, email, designation, dob, is_active } =
-    req.body;
+  const {
+    first_name,
+    last_name,
+    email,
+    designation,
+    dob,
+    is_active,
+    company_id,
+  } = req.body;
   let user = await User.findOne({
     where: {
       email: email,
+      company_id,
     },
   });
   if (user) {
@@ -27,6 +35,7 @@ router.post("/user/add", async (req, res) => {
     designation,
     dob,
     is_active,
+    company_id,
   });
 
   res.status(200).send({
@@ -70,27 +79,31 @@ router.post("/user/update/:id", async (req, res) => {
 
 router.post("/user/migrate", async (req, res) => {
   const { id, company_id } = req.body;
+
   let user = await User.findOne({
     where: {
       id: id,
     },
   });
-  const company = await Company.findOne({
+
+  let existingUser = await User.findOne({
     where: {
-      id: company_id,
+      email: user?.dataValues.email,
+      company_id,
     },
   });
-  if (!user) {
+
+  if (existingUser) {
     res.status(500).send({
       status: "failed",
       data: {},
-      message: "Unable to migrate user.",
+      message: "User with same email already exists.",
     });
     return;
   }
   await User.update(
     {
-      company_id: company?.id,
+      company_id: company_id,
     },
     {
       where: {
@@ -117,6 +130,10 @@ router.get("/users/:company_id", async (req, res) => {
     const users = await User.findAll({
       where: {
         company_id: company_id,
+      },
+      include: {
+        model: Company,
+        attributes: ["name"],
       },
     });
     res.status(200).send({

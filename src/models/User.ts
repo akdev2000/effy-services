@@ -1,7 +1,8 @@
-import { Column, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { Column, Model, Table } from "sequelize-typescript";
 
-import { DataTypes, InferAttributes, InferCreationAttributes } from "sequelize";
+import { DataTypes } from "sequelize";
 import sequelize from "../config/sequelize";
+import { Company } from "./Company";
 
 @Table({
   tableName: "users",
@@ -50,6 +51,8 @@ export class User extends Model {
   })
   is_active!: boolean;
 
+  public Company?: Company;
+
   public createdAt?: Date;
 
   public updatedAt?: Date;
@@ -58,3 +61,8 @@ export class User extends Model {
 }
 
 sequelize.addModels([User]);
+
+User.hasOne(Company, {
+  foreignKey: "id",
+  sourceKey: "company_id",
+});
