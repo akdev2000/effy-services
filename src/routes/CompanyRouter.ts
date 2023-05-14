@@ -1,10 +1,24 @@
 import { Router } from "express";
+import NodeGeocoder from "node-geocoder";
 import { Company } from "../models/Company";
+const geocoder = NodeGeocoder({
+  provider: "openstreetmap",
+});
 
 const router = Router();
 
+async function getAddress(latitude: number, longitude: number) {
+  try {
+    const res = await geocoder.reverse({ lat: latitude, lon: longitude });
+    return res[0].formattedAddress;
+  } catch (error) {
+    console.error(error);
+  }
+  return;
+}
+
 router.post("/company/add", async (req, res) => {
-  const { name, lat, long, address } = req.body;
+  const { name, lat, long } = req.body;
   let company = await Company.findOne({
     where: {
       name: name,
@@ -19,11 +33,13 @@ router.post("/company/add", async (req, res) => {
     return;
   }
 
+  let newAddress = await getAddress(lat, long);
+
   company = await Company.create({
     name,
     lat,
     long,
-    address,
+    address: newAddress ? newAddress : "Invalid Lat and Long",
   });
 
   res.status(200).send({
