@@ -50,12 +50,13 @@ router.post("/company/add", async (req, res) => {
 });
 
 router.post("/company/update/:id", async (req, res) => {
-  const { name, lat, long, address } = req.body;
+  const { name, lat, long } = req.body;
   let company = await Company.findOne({
     where: {
       id: req.params.id,
     },
   });
+  let newAddress = await getAddress(lat, long);
   if (!company) {
     res.status(500).send({
       status: "failed",
@@ -68,7 +69,7 @@ router.post("/company/update/:id", async (req, res) => {
     name,
     lat,
     long,
-    address,
+    address: newAddress ? newAddress : undefined,
   });
 
   res.status(200).send({
