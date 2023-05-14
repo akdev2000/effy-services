@@ -2,11 +2,12 @@ import express, { Application, Request, Response } from "express";
 import { CompanyRouter } from "./routes/CompanyRouter";
 import { UserRouter } from "./routes/UserRouter";
 import bodyParser from "body-parser";
-import cors from "cors"
+import cors from "cors";
 
 const app: Application = express();
 const port = 8005;
 
+// Allow all origin
 app.use(cors());
 
 // Body parsing Middleware
@@ -19,6 +20,7 @@ app.get("/", async (req: Request, res: Response): Promise<Response> => {
   });
 });
 
+// All Endpoints
 app.use("/api/v1", [CompanyRouter, UserRouter]);
 
 try {
