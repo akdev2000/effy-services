@@ -18,6 +18,7 @@ async function getLatLng(address: string) {
   }
 }
 
+// Create a company
 router.post("/company/add", async (req, res) => {
   const { name, address } = req.body;
   let company = await Company.findOne({
@@ -50,6 +51,7 @@ router.post("/company/add", async (req, res) => {
   });
 });
 
+// Update a company
 router.post("/company/update/:id", async (req, res) => {
   const { name, address } = req.body;
   let company = await Company.findOne({
@@ -80,6 +82,7 @@ router.post("/company/update/:id", async (req, res) => {
   });
 });
 
+// Get a specific company by ID
 router.get("/company/:id", async (req, res) => {
   const { id } = req.params;
   const company = await Company.findOne({
@@ -96,13 +99,14 @@ router.get("/company/:id", async (req, res) => {
     return;
   }
 
-  res.status(200).send({
+  res.status(500).send({
     status: "failed",
     data: {},
     message: "Unable to find Company",
   });
 });
 
+// Delete a company
 router.post("/company/delete/:id", async (req, res) => {
   const { id } = req.params;
   const company = await Company.findOne({
@@ -127,6 +131,7 @@ router.post("/company/delete/:id", async (req, res) => {
   });
 });
 
+// List companies
 router.get("/companies", async (req, res) => {
   const companies = await Company.findAll();
   res.status(200).send({

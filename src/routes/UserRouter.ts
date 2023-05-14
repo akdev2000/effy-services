@@ -4,6 +4,7 @@ import { User } from "../models/User";
 
 const router = Router();
 
+// Create a user / Add user to the company
 router.post("/user/add", async (req, res) => {
   const {
     first_name,
@@ -45,6 +46,7 @@ router.post("/user/add", async (req, res) => {
   });
 });
 
+// Update a user
 router.post("/user/update/:id", async (req, res) => {
   const { first_name, last_name, email, designation, dob, is_active } =
     req.body;
@@ -77,6 +79,7 @@ router.post("/user/update/:id", async (req, res) => {
   });
 });
 
+// Migrate a user
 router.post("/user/migrate", async (req, res) => {
   const { id, company_id } = req.body;
 
@@ -119,6 +122,7 @@ router.post("/user/migrate", async (req, res) => {
   });
 });
 
+// List users
 router.get("/users/:company_id", async (req, res) => {
   const { company_id } = req.params;
   const company = await Company.findOne({
@@ -144,13 +148,14 @@ router.get("/users/:company_id", async (req, res) => {
     return;
   }
 
-  res.status(200).send({
+  res.status(500).send({
     status: "failed",
     data: {},
     message: "Unable to find Company",
   });
 });
 
+// Get a specific user by ID
 router.get("/user/:id", async (req, res) => {
   const { id } = req.params;
   const user = await User.findOne({
@@ -167,13 +172,14 @@ router.get("/user/:id", async (req, res) => {
     return;
   }
 
-  res.status(200).send({
+  res.status(500).send({
     status: "failed",
     data: {},
     message: "Unable to find user",
   });
 });
 
+// Deactivate a user (sets to active=false)
 router.post("/user/deactivate/:id", async (req, res) => {
   const { id } = req.params;
   const user = await User.findOne({
@@ -200,6 +206,7 @@ router.post("/user/deactivate/:id", async (req, res) => {
   });
 });
 
+// Delete a user / Remove user from the company
 router.post("/user/delete/:id", async (req, res) => {
   const { id } = req.params;
   const user = await User.findOne({
