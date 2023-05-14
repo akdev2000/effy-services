@@ -6,19 +6,20 @@ const geocoder = NodeGeocoder({
 });
 
 const router = Router();
-
-async function getAddress(latitude: number, longitude: number) {
+async function getLatLng(address: string) {
   try {
-    const res = await geocoder.reverse({ lat: latitude, lon: longitude });
-    return res[0].formattedAddress;
+    const res = await geocoder.geocode(address);
+    return {
+      latitude: res[0].latitude,
+      longitude: res[0].longitude,
+    };
   } catch (error) {
     console.error(error);
   }
-  return;
 }
 
 router.post("/company/add", async (req, res) => {
-  const { name, lat, long } = req.body;
+  const { name, address } = req.body;
   let company = await Company.findOne({
     where: {
       name: name,
@@ -33,13 +34,13 @@ router.post("/company/add", async (req, res) => {
     return;
   }
 
-  let newAddress = await getAddress(lat, long);
+  let latLong = await getLatLng(address);
 
   company = await Company.create({
     name,
-    lat,
-    long,
-    address: newAddress ? newAddress : "Invalid Lat and Long",
+    lat: latLong?.latitude || 0,
+    long: latLong?.longitude || 0,
+    address,
   });
 
   res.status(200).send({
@@ -50,13 +51,13 @@ router.post("/company/add", async (req, res) => {
 });
 
 router.post("/company/update/:id", async (req, res) => {
-  const { name, lat, long } = req.body;
+  const { name, address } = req.body;
   let company = await Company.findOne({
     where: {
       id: req.params.id,
     },
   });
-  let newAddress = await getAddress(lat, long);
+  let latLong = await getLatLng(address);
   if (!company) {
     res.status(500).send({
       status: "failed",
@@ -67,9 +68,9 @@ router.post("/company/update/:id", async (req, res) => {
   }
   company.update({
     name,
-    lat,
-    long,
-    address: newAddress ? newAddress : undefined,
+    lat: latLong?.latitude || 0,
+    long: latLong?.longitude || 0,
+    address,
   });
 
   res.status(200).send({
