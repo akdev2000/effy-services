@@ -13,7 +13,7 @@ module.exports = {
         type: DataTypes.INTEGER,
       },
       name: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       address : {
