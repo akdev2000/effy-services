@@ -1,6 +1,7 @@
 import { Router } from "express";
 import NodeGeocoder from "node-geocoder";
 import { Company } from "../models/Company";
+import { User } from "../models/User";
 const geocoder = NodeGeocoder({
   provider: "openstreetmap",
 });
@@ -123,7 +124,13 @@ router.post("/company/delete/:id", async (req, res) => {
     return;
   }
 
-  company.destroy();
+  await User.destroy({
+    where: {
+      company_id: id,
+    },
+  });
+
+  await company.destroy();
   res.status(200).send({
     status: "success",
     data: {},
